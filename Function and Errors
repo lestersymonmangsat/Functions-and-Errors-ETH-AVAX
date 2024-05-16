@@ -10,7 +10,7 @@ contract FunctionAndErrors {
 
     function transferEther(address recipient, uint256 amount) external {
         
-        require(msg.sender == contractOwner, "Only the owner can transfer Ether");
+        require(msg.sender == Symon, "Only the owner can transfer Ether");
         
         require(recipient != address(0), "Invalid recipient address");
 
