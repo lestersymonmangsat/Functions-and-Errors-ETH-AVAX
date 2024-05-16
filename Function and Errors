@@ -1,37 +1,40 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.17;
 
-contract FunctionAndErrors { 
+contract FunctionAndErrors {
     address public Symon;
-    uint256 public Balance;
-
-    event Deposit(address indexed from, uint256 amount);
-    event Withdraw(address indexed to, uint256 amount);
 
     constructor() {
         Symon = msg.sender;
-        Balance = 0; // Initial balance is set to 0
     }
 
-    function deposit() public payable {
-        require(msg.value > 0, "Deposit amount should be greater than 0");
-        Balance += msg.value;
-        emit Deposit(msg.sender, msg.value);
+    function transferEther(address recipient, uint256 amount) external {
+        
+        require(msg.sender == contractOwner, "Only the owner can transfer Ether");
+        
+        require(recipient != address(0), "Invalid recipient address");
+
+        
+        require(address(this).balance >= amount, "Insufficient balance");
+
+       
+        payable(recipient).transfer(amount);
     }
 
-    function withdraw(uint256 amount) public {
-        require(msg.sender == Symon, "Only the contract owner can withdraw");
-        require(amount > 0, "Withdrawal amount should be greater than 0");
-        require(amount <= Balance, "Insufficient balance");
-
-        Balance -= amount;
-        payable(msg.sender).transfer(amount);
-
-        emit Withdraw(msg.sender, amount);
+    function assertCondition(uint256 inputValue) external pure returns (uint256) {
+        
+        assert(inputValue != 0);
+        
+        // Return the inputValue multiplied by 2
+        return inputValue * 2;
     }
 
-    function checkBalance() public view returns (uint256) {
-        require(msg.sender == Symon, "Only the contract owner can check the balance");
-        return Balance;
+    function revertFunction(uint256 inputValue) external pure returns (uint256) {
+        
+        if (inputValue == 0) {
+            revert("Input cannot be zero");
+        }
+        
+        return inputValue * 2;
     }
 }
