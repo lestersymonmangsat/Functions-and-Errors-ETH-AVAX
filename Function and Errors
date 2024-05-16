@@ -3,28 +3,33 @@ pragma solidity ^0.8.0;
 
 contract FunctionAndErrors { 
     address public Symon;
-    uint256 public Balance = 50;
+    uint256 public Balance;
+
+    event Deposit(address indexed from, uint256 amount);
+    event Withdraw(address indexed to, uint256 amount);
 
     constructor() {
         Symon = msg.sender;
+        Balance = 0; // Initial balance is set to 0
     }
 
-   
     function deposit() public payable {
         require(msg.value > 0, "Deposit amount should be greater than 0");
-       Balance += msg.value;
+        Balance += msg.value;
+        emit Deposit(msg.sender, msg.value);
     }
 
-  
     function withdraw(uint256 amount) public {
-        assert(amount <=Balance);
         require(msg.sender == Symon, "Only the contract owner can withdraw");
         require(amount > 0, "Withdrawal amount should be greater than 0");
+        require(amount <= Balance, "Insufficient balance");
+
         Balance -= amount;
-        revert("Withdrawal successful, but custom error message");
+        payable(msg.sender).transfer(amount);
+
+        emit Withdraw(msg.sender, amount);
     }
 
-   
     function checkBalance() public view returns (uint256) {
         require(msg.sender == Symon, "Only the contract owner can check the balance");
         return Balance;
