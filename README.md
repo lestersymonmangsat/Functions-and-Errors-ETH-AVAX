@@ -1,4 +1,4 @@
-Functions and Errors Smart Contract
+#Functions and Errors Smart Contract
 This Solidity smart contract demonstrates basic functionality related to deposits, withdrawals, and balance checks. It includes the following features:
 
 Deposit Function:
