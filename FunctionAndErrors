@@ -1,0 +1,43 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MangsatGasoline {
+
+    struct Pump {
+        uint256 pumpId;
+        uint256 pricePerLiter;
+        uint256 availableLiters;
+    }
+
+    mapping(uint256 => Pump) public pumps;
+    
+    event FuelPurchased(address indexed buyer, uint256 pumpId, uint256 liters, uint256 totalCost);
+    
+    address public owner;
+    
+    constructor() {
+        owner = msg.sender;
+    }
+    
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only owner can perform this action");
+        _;
+    }
+    
+    function addPump(uint256 _pumpId, uint256 _pricePerLiter, uint256 _initialLiters) external onlyOwner {
+        pumps[_pumpId] = Pump(_pumpId, _pricePerLiter, _initialLiters);
+    }
+    
+    function purchaseFuel(uint256 _pumpId, uint256 _liters) external payable {
+        require(pumps[_pumpId].availableLiters >= _liters, "Not enough fuel available");
+        
+        uint256 totalCost = _liters * pumps[_pumpId].pricePerLiter;
+        require(msg.value >= totalCost, "Insufficient funds sent");
+        
+        payable(owner).transfer(totalCost);
+        
+        pumps[_pumpId].availableLiters -= _liters;
+        
+        emit FuelPurchased(msg.sender, _pumpId, _liters, totalCost);
+    }
+}
