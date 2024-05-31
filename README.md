@@ -1,12 +1,17 @@
 MangsatGasoline Smart Contract
+
 Overview
+
 MangsatGasoline is a decentralized application (dApp) built on the Ethereum blockchain. It allows the owner to manage multiple fuel pumps, set prices, and sell fuel to users. Users can purchase fuel by sending Ether to the contract, which will be transferred to the owner.
 
 Features
+
 Pump Management: The owner can add new fuel pumps with a specific ID, price per liter, and initial quantity of fuel.
 Fuel Purchase: Users can purchase fuel by specifying the pump ID and the desired quantity of liters. The payment is made in Ether.
 Smart Contract Details
 Pump Structure
+
+
 The contract uses a Pump structure to represent each fuel pump:
 
 pumpId (uint256): The unique identifier for the pump.
