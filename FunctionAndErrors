@@ -10,8 +10,10 @@ contract MangsatGasoline {
     }
 
     mapping(uint256 => Pump) public pumps;
+    mapping(address => uint256) public excessFunds;
     
     event FuelPurchased(address indexed buyer, uint256 pumpId, uint256 liters, uint256 totalCost);
+    event ExcessFundsWithdrawn(address indexed user, uint256 amount);
     
     address public owner;
     
@@ -25,19 +27,35 @@ contract MangsatGasoline {
     }
     
     function addPump(uint256 _pumpId, uint256 _pricePerLiter, uint256 _initialLiters) external onlyOwner {
+        require(pumps[_pumpId].pumpId == 0, "Pump already exists"); // Check if pump already exists
         pumps[_pumpId] = Pump(_pumpId, _pricePerLiter, _initialLiters);
     }
     
     function purchaseFuel(uint256 _pumpId, uint256 _liters) external payable {
+        require(pumps[_pumpId].pumpId != 0, "Pump does not exist"); // Check if pump exists
         require(pumps[_pumpId].availableLiters >= _liters, "Not enough fuel available");
         
         uint256 totalCost = _liters * pumps[_pumpId].pricePerLiter;
         require(msg.value >= totalCost, "Insufficient funds sent");
+        
+        if (msg.value > totalCost) {
+            excessFunds[msg.sender] += (msg.value - totalCost); // Add excess funds to the user's account
+        }
         
         payable(owner).transfer(totalCost);
         
         pumps[_pumpId].availableLiters -= _liters;
         
         emit FuelPurchased(msg.sender, _pumpId, _liters, totalCost);
+    }
+    
+    function withdrawExcessFunds() external {
+        uint256 amount = excessFunds[msg.sender];
+        require(amount > 0, "No excess funds available");
+        
+        excessFunds[msg.sender] = 0;
+        payable(msg.sender).transfer(amount);
+        
+        emit ExcessFundsWithdrawn(msg.sender, amount);
     }
 }
