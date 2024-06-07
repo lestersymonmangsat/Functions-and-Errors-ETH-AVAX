@@ -1,0 +1,55 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+contract MangsatGasoline {
+    mapping(address => bool) private hasRefueled;
+    uint256 private refuelCount;
+    uint256 public constant MAX_REFUELS = 100;
+
+    event Refuel(address indexed driver);
+
+    // Modifier to chaeck if a driver can refuel
+    modifier canRefuel() {
+        // Check if the driver has not refueled before
+        require(!hasRefueled[msg.sender], "You have already refueled");
+        // Check if the maximum number of refuels has not been reached
+        require(refuelCount < MAX_REFUELS, "Maximum number of refuels reached");
+        _;
+    }
+
+    // Function for drivers to refuel their vehicle
+    function refuel() public canRefuel {
+        // Mark the driver as having refueled
+        hasRefueled[msg.sender] = true;
+        // Increment the total refuel count
+        refuelCount++;
+        // Emit an event to log the refuel transaction
+        emit Refuel(msg.sender);
+    }
+
+    // Function to get the total number of refuels
+    function totalRefuelCount() public view returns (uint256) {
+        return refuelCount;
+    }
+
+    // Function to check if a driver has refueled
+    function hasDriverRefueled(address driver) public view returns (bool) {
+        return hasRefueled[driver];
+    }
+
+    // Function to demonstrate assert statement
+    function assertGasoline(uint256 a, uint256 b) public pure returns (uint256) {
+        // Ensure 'b' is not zero, otherwise trigger an assertion
+        assert(b != 0); // Assert 'b' is not zero
+        // Return the result of the division
+        return a / b;
+    }
+
+    // Function to demonstrate require statement
+    function revertGasoline(uint256[] memory data) public pure {
+        // Ensure the data array is not empty, otherwise revert with an error message
+        require(data.length > 0, "Data array must not be empty");
+        // Process the data; if something goes wrong, revert with an error message
+        revert("Something went wrong");
+    }
+}
