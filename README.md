@@ -1,48 +1,97 @@
 # MangsatGasoline Smart Contract
 
 ## Overview
-The MangsatGasoline smart contract is designed to facilitate the purchase of gasoline from various pumps. It allows the owner of the contract to add pumps with different prices per liter and initial amounts of fuel. Users can then purchase fuel from these pumps by sending the appropriate amount of ether.
+The `MangsatGasoline` smart contract is designed to simulate a simple gasoline refueling system. It allows a limited number of refuels and ensures that each address can only refuel once.
+### Features
+`Single Refuel Per Address:` Each address can refuel only once.
 
-## Contract Features
-### Pump Struct
+`Maximum Refuels Limit:` A maximum of 100 refuels is allowed.
 
-`pumpId:` Unique identifier for each pump.
+`Event Logging:` Refuel events are logged for transparency.
 
-`pricePerLiter:` Price per liter of gasoline at the pump.
+`Utility Functions:` Additional functions to demonstrate the use of `assert` and `require` statements.
 
-`availableLiters:` Amount of gasoline available at the pump.
+## Contract Details
+### State Variables
+
+`mapping(address => bool) private hasRefueled: ` Tracks if an address has refueled.
+
+`uint256 private refuelCount:`  Counter for the total number of refuels.
+
+`uint256 public constant MAX_REFUELS:` Constant representing the maximum number of refuels allowed (100).
 
 ### Functions
 
-`constructor:` Initializes the contract owner.
+`refuel()`
 
-`addPump:` Allows the owner to add a new pump with a specified ID, price per liter, and initial amount of fuel.
+Allows an address to refuel their vehicle if they haven't already and the maximum refuels limit hasn't been reached.
 
-`purchaseFuel:` Enables users to purchase fuel from a specific pump by specifying the pump ID and the desired number of liters. Users must send enough ether to cover the total cost.
+```
+function refuel() public canRefuel {
+    hasRefueled[msg.sender] = true;
+    refuelCount++;
+    emit Refuel(msg.sender);
+}
+```
 
-`withdrawExcessFunds:` Allows users to withdraw any excess funds that were not used during a fuel purchase.
+`totalRefuelCount() `
+
+Returns the total number of refuels.
+
+```
+function totalRefuelCount() public view returns (uint256) {
+    return refuelCount;
+}
+```
+
+`hasDriverRefueled(address driver)`
+
+Checks if a specific address has refueled.
+
+```
+function hasDriverRefueled(address driver) public view returns (bool) {
+    return hasRefueled[driver];
+}
+```
+    
+`assertGasoline(uint256 a, uint256 b)`
+
+Demonstrates the use of an `assert` statement by performing a division operation
+
+```
+function assertGasoline(uint256 a, uint256 b) public pure returns (uint256) {
+    assert(b != 0);
+    return a / b;
+}
+```
+
+`revertGasoline(uint256[] memory data)`
+
+Demonstrates the use of a require statement and a revert statement.
+
+```
+function revertGasoline(uint256[] memory data) public pure {
+    require(data.length > 0, "Data array must not be empty");
+    revert("Something went wrong");
+}
+```
 
 ### Events
-
-### `FuelPurchased:` 
-Triggered when a user successfully purchases fuel. Contains information about the buyer, pump ID, purchased liters, and total cost.
-
-### `ExcessFundsWithdrawn:` 
-Triggered when a user withdraws excess funds. Contains information about the user and the withdrawn amount.
+`event Refuel(address indexed driver):` Emitted when a driver refuels.
 
 ### Modifiers
 
-`onlyOwner:` Restricts certain functions to be called only by the owner of the contract.
+`modifier canRefuel()` Ensures that an address can refuel only if it has not done so before and the maximum refuels limit has not been reached.
 
 ## Usage
 
-1. Deploy the MangsatGasoline contract to an Ethereum-compatible blockchain.
+1. Deploy the Contract: Deploy the `MangsatGasoline`contract to your preferred Ethereum network.
 
-2. As the owner of the contract, use the addPump function to add pumps with unique IDs, prices per liter, and initial amounts of fuel.
+2. Refuel: Call the `refuel()` function to refuel your vehicle. Ensure you haven't refueled before and the maximum limit hasn't been reached.
 
-3. Users can purchase fuel by calling the purchaseFuel function with the desired pump ID and number of liters, sending enough ether to cover the total cost.
+3. Check Refuel Status: Use `hasDriverRefueled(address driver)` to check if a specific address has refueled.
 
-4. Users can withdraw any excess funds using the withdrawExcessFunds function.
+4. View Total Refuels: Call `totalRefuelCount()` to get the current number of refuels.
 
 
 ### License
